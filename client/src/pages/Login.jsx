@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 // Kết nối API (tạm thời tắt)
 // import api from "../services/api";
@@ -11,18 +12,15 @@ function Login() {
   const [password, setPassword] = useState("");
 
   // Hàm đăng nhập (tạm thời chưa kết nối backend)
-  const handleLogin = () => {
+  const handleLogin = async () => {
 
-    // Kiểm tra nhập đủ dữ liệu
     if (!email || !password) {
       alert("Vui lòng nhập đầy đủ email và mật khẩu");
       return;
-    }
+   }
 
-    // ===============================
-    // Sau này kết nối backend thì mở lại đoạn dưới
-    /*
     try {
+
       const res = await api.post("/auth/login", {
         email,
         password,
@@ -33,15 +31,15 @@ function Login() {
       alert(res.data.message);
 
       navigate("/dashboard");
-    } catch (err) {
-      alert(err.response?.data?.message || "Đăng nhập thất bại");
-    }
-    */
-    // ===============================
 
-    // Tạm thời chuyển thẳng sang Dashboard
-    navigate("/dashboard");
-  };
+    } catch (err) {
+
+      alert(
+        err.response?.data?.message ||
+        "Đăng nhập thất bại"
+      );
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">

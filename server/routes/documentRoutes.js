@@ -6,6 +6,7 @@ const multer = require("multer");
 const { readPDF } = require("../services/pdfService");
 const { generateQuestions } = require("../services/aiService");
 const { saveQuestion } = require("../models/questionModel");
+const db = require("../database/db");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -38,6 +39,12 @@ router.post(
         text.substring(0, 12000)
       );
 
+      await new Promise((resolve, reject) => {
+    db.run("DELETE FROM questions", (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
       // Lưu database
       for (const q of questions) {
         await saveQuestion(q);

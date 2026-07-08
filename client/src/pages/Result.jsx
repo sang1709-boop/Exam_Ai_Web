@@ -1,13 +1,33 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Result() {
   const navigate = useNavigate();
+  const { state } = useLocation();
 
-  // Dữ liệu mẫu
-  const score = 8;
-  const total = 10;
-  const correct = 8;
-  const wrong = 2;
+  const score = state?.score || 0;
+  const total = state?.total || 0;
+
+  const correct = score;
+  const wrong = total - score;
+
+  if (!state) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">
+            Chưa có kết quả bài thi
+          </h2>
+
+          <button
+            onClick={() => navigate("/exam")}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg"
+          >
+            Làm bài
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center">

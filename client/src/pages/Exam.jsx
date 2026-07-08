@@ -1,58 +1,60 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "../services/api";
 
 function Exam() {
   const navigate = useNavigate();
 
-  const questions = [
-    {
-      id: 1,
-      question: "AI là viết tắt của từ gì?",
-      options: [
-        "Artificial Intelligence",
-        "Automatic Internet",
-        "Artificial Internet",
-        "Apple Intelligence",
-      ],
-    },
-    {
-      id: 2,
-      question: "React được phát triển bởi công ty nào?",
-      options: [
-        "Google",
-        "Microsoft",
-        "Facebook",
-        "Apple",
-      ],
-    },
-    {
-      id: 3,
-      question: "HTML là gì?",
-      options: [
-        "Ngôn ngữ lập trình",
-        "Hệ quản trị cơ sở dữ liệu",
-        "Ngôn ngữ đánh dấu",
-        "Framework",
-      ],
-    },
-  ];
-
+  const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
 
-  const handleChoose = (questionId, option) => {
-    setAnswers({
-      ...answers,
-      [questionId]: option,
-    });
+  useEffect(() => {
+    loadQuestions();
+  }, []);
+
+  const loadQuestions = async () => {
+    try {
+      const res = await api.get("/questions");
+      setQuestions(res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Không tải được câu hỏi");
+    }
   };
 
-  const handleSubmit = () => {
+  const handleChoose = (questionId, option) => {
+
+    setAnswers((prev) => {
+        const newAnswers = {
+            ...prev,
+            [questionId]: option,
+        };
+
+        console.log(newAnswers);
+
+        return newAnswers;
+    });
+
+};
+
+  const handleSubmit = async () => {
     if (Object.keys(answers).length < questions.length) {
       alert("Vui lòng trả lời tất cả câu hỏi!");
       return;
     }
 
-    navigate("/result");
+    try {
+      const res = await api.post("/questions/submit", {
+        answers,
+      });
+
+      navigate("/result", {
+        state: res.data,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Không thể nộp bài");
+    }
   };
 
   return (
@@ -72,7 +74,12 @@ function Exam() {
               Câu {index + 1}: {q.question}
             </h2>
 
-            {q.options.map((option, i) => (
+            {[
+              q.optionA,
+              q.optionB,
+              q.optionC,
+              q.optionD,
+            ].map((option, i) => (
               <label
                 key={i}
                 className="flex items-center mb-3 cursor-pointer"
